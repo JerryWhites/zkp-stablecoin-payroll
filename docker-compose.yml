@@ -1,0 +1,144 @@
+# ====================================
+# CZKP Payroll — Docker Compose (Production)
+# ====================================
+# Usage:
+#   1. Copy .env.docker.example to .env
+#   2. Fill in all required secrets
+#   3. docker compose up -d
+#   4. Access at https://your-domain.cz
+
+services:
+  # ── PostgreSQL Database ───────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: czkp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-czkp_payroll}
+      POSTGRES_USER: ${DB_USER:-czkp_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-czkp_user} -d ${DB_NAME:-czkp_payroll}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Backend API ───────────────────────────────
+  backend:
+    build:
+      context: ./payroll-backend
+      dockerfile: Dockerfile
+    container_name: czkp-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: postgresql://${DB_USER:-czkp_user}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-czkp_payroll}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET is required}
+      PASSWORD_PEPPER: ${PASSWORD_PEPPER:?PASSWORD_PEPPER is required}
+      MASTER_ENCRYPTION_KEY: ${MASTER_ENCRYPTION_KEY:?MASTER_ENCRYPTION_KEY is required}
+      ALLOWED_ORIGINS: https://${DOMAIN:-localhost}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - backend-logs:/app/logs
+      - backend-uploads:/app/uploads
+      - backend-exports:/app/exports
+      - backend-backups:/app/backups
+    networks:
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`${DOMAIN:-localhost}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.backend.middlewares=security-headers"
+      - "traefik.http.services.backend.loadbalancer.server.port=5000"
+
+  # ── Frontend (nginx SPA) ─────────────────────
+  frontend:
+    build:
+      context: ./czkp-secure-landing/czkp-secure-main
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE: /api
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-}
+        VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY:-}
+    container_name: czkp-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`${DOMAIN:-localhost}`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.frontend.middlewares=security-headers"
+      - "traefik.http.routers.frontend.priority=1"
+      - "traefik.http.services.frontend.loadbalancer.server.port=8080"
+
+  # ── Reverse Proxy (Traefik with auto TLS) ────
+  traefik:
+    image: traefik:v3.2
+    container_name: czkp-traefik
+    restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # HTTP → HTTPS redirect
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      # Let's Encrypt automatic TLS
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:?ACME_EMAIL is required for TLS}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      # Security
+      - "--api.dashboard=false"
+      - "--accesslog=true"
+      - "--log.level=WARN"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+    networks:
+      - internal
+    labels:
+      # Global security headers middleware
+      - "traefik.http.middlewares.security-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.security-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.security-headers.headers.stsPreload=true"
+      - "traefik.http.middlewares.security-headers.headers.frameDeny=true"
+      - "traefik.http.middlewares.security-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.security-headers.headers.browserXssFilter=true"
+
+volumes:
+  pgdata:
+    driver: local
+  backend-logs:
+    driver: local
+  backend-uploads:
+    driver: local
+  backend-exports:
+    driver: local
+  backend-backups:
+    driver: local
+  letsencrypt:
+    driver: local
+
+networks:
+  internal:
+    driver: bridge

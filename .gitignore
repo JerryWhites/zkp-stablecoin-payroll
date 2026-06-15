@@ -1,0 +1,70 @@
+# ───────────────────────────────────────────────
+# Secrets & environment (NEVER COMMIT)
+# ───────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+!.env.docker.example
+*.pem
+*.key
+*.crt
+*.p12
+secrets/
+private/
+
+# ───────────────────────────────────────────────
+# Dependencies & build output
+# ───────────────────────────────────────────────
+node_modules/
+dist/
+build/
+.vite/
+coverage/
+
+# ───────────────────────────────────────────────
+# Databases, dumps & PII-bearing artifacts
+# ───────────────────────────────────────────────
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+*.sqlite
+*.sqlite3
+*.sqlite-bak
+*.bak
+*.backup
+backups/
+exports/
+uploads/
+logs/
+*.log
+payroll.csv
+
+# ───────────────────────────────────────────────
+# Internal docs (not for public repo)
+# ───────────────────────────────────────────────
+context_files/
+
+# ───────────────────────────────────────────────
+# Local toolchains accidentally rooted here
+# ───────────────────────────────────────────────
+.cargo/
+.rustup/
+.nvm/
+.dotnet/
+.npm/
+.cache/
+.aleo/
+.codex/
+.landscape/
+.vscode-server/
+
+# ───────────────────────────────────────────────
+# Editor / OS
+# ───────────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

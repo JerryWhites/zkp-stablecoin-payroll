@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+
+# Database files (binary, no value to AI)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+payroll.db
+
+# Lock files
+package-lock.json
+bun.lockb
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Exports & backups (may contain PII)
+exports/
+backups/
+
+# Uploads
+uploads/
+
+# Fonts (binary)
+fonts/
+
+# Build output
+dist/
+build/
+
+# Environment
+.env
+.env.*
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Backup files from old migrations
+*.sqlite-bak
+*.bak
+*.backup
+
+# Test artifacts
+test-cz-font.pdf
+coverage/
+
+# Docker (not needed for code understanding)
+.dockerignore
+Dockerfile

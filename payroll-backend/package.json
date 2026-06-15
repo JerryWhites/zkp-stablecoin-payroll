@@ -1,0 +1,47 @@
+{
+  "name": "payroll-backend",
+  "version": "2.0.0",
+  "description": "🔒 Unhackable Payroll Backend - Security-hardened Express API",
+  "main": "server-secure.js",
+  "scripts": {
+    "start": "node server-secure.js",
+    "start:old": "node server.js",
+    "dev": "nodemon server-secure.js",
+    "test": "node tests/test-payroll-engine.js",
+    "audit": "npm audit",
+    "audit:fix": "npm audit fix",
+    "generate:jwt-secret": "node -e \"console.log('JWT_SECRET=' + require('crypto').randomBytes(64).toString('hex'))\"",
+    "generate:db-key": "node -e \"console.log('DATABASE_ENCRYPTION_KEY=' + require('crypto').randomBytes(32).toString('hex'))\"",
+    "security:check": "npm audit && echo '✅ Security check passed'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@aleohq/sdk": "^0.6.9",
+    "archiver": "^7.0.1",
+    "axios": "^1.13.2",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.2.1",
+    "express-validator": "^7.3.1",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^1.4.5-lts.1",
+    "pdfkit": "^0.17.2",
+    "pg": "^8.18.0",
+    "qrcode": "^1.5.4",
+    "speakeasy": "^2.0.0",
+    "uuid": "^13.0.0",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}

@@ -1,0 +1,22 @@
+# Backend Docker ignore
+node_modules
+npm-debug.log*
+.env
+.env.*
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite-bak
+logs/
+uploads/
+exports/
+backups/
+coverage/
+.git
+.gitignore
+.vscode
+.idea
+README.md
+tests/
+*.bak
+*.backup

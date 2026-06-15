@@ -1,0 +1,57 @@
+# Environment variables - NIKDY NECOMMITOVAT!
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Node modules
+node_modules/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+payroll.db
+
+# Uploaded files
+uploads/
+uploads/quarantine/
+temp/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Exports & backups (may contain PII)
+exports/
+backups/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Build output
+dist/
+build/
+
+# Private keys and certificates
+*.pem
+*.key
+*.crt
+*.p12
+private/
+secrets/
+
+# Backup files
+backups/
+*.bak
+*.backup
+*.sqlite-bak
+
+# Coverage
+coverage/

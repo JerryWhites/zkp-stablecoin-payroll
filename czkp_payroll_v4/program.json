@@ -1,0 +1,22 @@
+{
+  "program": "czkp_payroll_v4.aleo",
+  "version": "0.1.0",
+  "description": "CZKP Payroll v4 — Private salary payments via ALEO credits + USDCx stablecoin",
+  "license": "MIT",
+  "leo": "3.4.0",
+  "dependencies": [
+    {
+      "name": "credits.aleo",
+      "location": "network",
+      "path": null,
+      "edition": null
+    },
+    {
+      "name": "token_registry.aleo",
+      "location": "network",
+      "path": null,
+      "edition": null
+    }
+  ],
+  "dev_dependencies": null
+}

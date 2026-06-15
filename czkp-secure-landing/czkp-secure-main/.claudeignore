@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+.vite/
+
+# Lock files
+package-lock.json
+bun.lockb
+
+# Environment
+.env
+.env.*
+
+# Logs
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+.dockerignore
+Dockerfile
+nginx.conf
+
+# Supabase local
+supabase/.temp/
+
+# Coverage
+coverage/
